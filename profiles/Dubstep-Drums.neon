@@ -1,0 +1,25 @@
+{
+  "name": "Aggressive Drum Compressor",
+  "hasConvolution": false,
+  "irSampleRate": 48000.0,
+  "eqBands": [
+    {"freq": 80.0, "gain": 4.5, "q": 0.6, "type": 1},
+    {"freq": 220.0, "gain": -3.0, "q": 1.4, "type": 0},
+    {"freq": 4500.0, "gain": 2.0, "q": 1.8, "type": 0},
+    {"freq": 9000.0, "gain": 3.5, "q": 0.8, "type": 2}
+  ],
+  "compressor": {
+    "threshold_db": -22.0,
+    "ratio": 5.5,
+    "knee_db": 4.0,
+    "attack_ms": 3.0,
+    "release_ms": 85.0,
+    "makeup_db": 4.0,
+    "enabled": true
+  },
+  "saturator": {
+    "drive_db": 8.0,
+    "mix": 0.45,
+    "enabled": true
+  }
+}
