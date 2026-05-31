@@ -122,7 +122,7 @@ void NeonForgeEditor::rebuildKnobs()
         slider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 56, 16);
         slider->setRange (dp.minVal, dp.maxVal, 0.001);
         slider->setValue (*dp.value, juce::dontSendNotification);
-        slider->setColour (juce::Slider::rotarySliderFillId, juce::Colour (0xffffaa00));
+        slider->setColour (juce::Slider::rotarySliderFillColourId, juce::Colour (0xffffaa00));
         float* ptr = dp.value;
         slider->onValueChange = [ptr, slider]() { *ptr = (float) slider->getValue(); };
         addAndMakeVisible (slider);
