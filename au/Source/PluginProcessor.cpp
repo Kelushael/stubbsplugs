@@ -159,25 +159,35 @@ std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedPara
     std::vector<DerivedParam> out;
     const juce::ScopedLock sl (profileLock);
 
+    auto add = [&out] (const char* n, float* v, float mn, float mx)
+    {
+        DerivedParam dp;
+        dp.name   = n;
+        dp.value  = v;
+        dp.minVal = mn;
+        dp.maxVal = mx;
+        out.push_back (dp);
+    };
+
     for (int i = 0; i < profile.eqBands.size(); ++i)
     {
         auto& b = profile.eqBands.getReference (i);
         std::string eqName = "EQ" + std::to_string (i+1);
-        out.push_back ({eqName + " Freq", &b.freq, 20.0f, 20000.0f});
-        out.push_back ({eqName + " Gain", &b.gain, -18.0f, 18.0f});
-        out.push_back ({eqName + " Q",    &b.q,    0.1f,   10.0f});
+        add ((eqName + " Freq").c_str(), &b.freq, 20.0f, 20000.0f);
+        add ((eqName + " Gain").c_str(), &b.gain, -18.0f, 18.0f);
+        add ((eqName + " Q").c_str(),    &b.q,    0.1f,   10.0f);
     }
     if (profile.comp.enabled)
     {
-        out.push_back ({"Threshold", &profile.comp.threshold_db, -60.0f, 0.0f});
-        out.push_back ({"Ratio",     &profile.comp.ratio,        1.0f,   20.0f});
-        out.push_back ({"Attack",    &profile.comp.attack_ms,    0.1f,   200.0f});
-        out.push_back ({"Release",   &profile.comp.release_ms,   1.0f,   2000.0f});
+        add ("Threshold", &profile.comp.threshold_db, -60.0f, 0.0f);
+        add ("Ratio",     &profile.comp.ratio,        1.0f,   20.0f);
+        add ("Attack",    &profile.comp.attack_ms,    0.1f,   200.0f);
+        add ("Release",   &profile.comp.release_ms,   1.0f,   2000.0f);
     }
     if (profile.sat.enabled)
     {
-        out.push_back ({"Drive",   &profile.sat.drive_db, 0.0f, 24.0f});
-        out.push_back ({"Sat Mix", &profile.sat.mix,      0.0f, 1.0f});
+        add ("Drive",   &profile.sat.drive_db, 0.0f, 24.0f);
+        add ("Sat Mix", &profile.sat.mix,      0.0f, 1.0f);
     }
     return out;
 }
