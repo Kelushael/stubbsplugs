@@ -47,20 +47,30 @@ NeonForgeEditor::NeonForgeEditor (NeonForgeProcessor& p)
 
     saveButton.onClick = [this]
     {
-        juce::FileChooser chooser ("Save NeonForge Profile", juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getChildFile ("MyClone.neon"), "*.neon");
-        if (chooser.browseForFileToSave (true))
-            audioProcessor.saveProfileFile (chooser.getResult());
+        auto chooser = std::make_shared<juce::FileChooser> ("Save NeonForge Profile",
+            juce::File::getSpecialLocation (juce::File::userDesktopDirectory).getChildFile ("MyClone.neon"),
+            "*.neon");
+        chooser->launchAsync (juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles,
+            [this, chooser] (const juce::FileChooser& fc)
+            {
+                if (fc.getResult() == juce::File{}) return;
+                audioProcessor.saveProfileFile (fc.getResult());
+            });
     };
     addChildComponent (saveButton);
 
     loadButton.onClick = [this]
     {
-        juce::FileChooser chooser ("Load NeonForge Profile", juce::File::getSpecialLocation (juce::File::userDesktopDirectory), "*.neon");
-        if (chooser.browseForFileToOpen())
-        {
-            audioProcessor.loadProfileFile (chooser.getResult());
-            enterClonedMode();
-        }
+        auto chooser = std::make_shared<juce::FileChooser> ("Load NeonForge Profile",
+            juce::File::getSpecialLocation (juce::File::userDesktopDirectory),
+            "*.neon");
+        chooser->launchAsync (juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
+            [this, chooser] (const juce::FileChooser& fc)
+            {
+                if (fc.getResult() == juce::File{}) return;
+                audioProcessor.loadProfileFile (fc.getResult());
+                enterClonedMode();
+            });
     };
     addChildComponent (loadButton);
 

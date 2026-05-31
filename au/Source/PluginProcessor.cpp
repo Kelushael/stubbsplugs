@@ -57,14 +57,17 @@ void NeonForgeProcessor::processParametric (juce::AudioBuffer<float>& buffer)
     const int chans = buffer.getNumChannels();
     const int n = buffer.getNumSamples();
 
-    // EQ
+    // EQ (sample-by-sample through each active filter)
     for (int i = 0; i < n; ++i)
     {
         float L = chans > 0 ? buffer.getSample (0, i) : 0.0f;
         float R = chans > 1 ? buffer.getSample (1, i) : L;
 
-        L = eqLeft.chain.processSample (L);
-        R = eqRight.chain.processSample (R);
+        for (int b = 0; b < maxBands; ++b)
+        {
+            if (eqLeft[b] != nullptr) L = eqLeft[b]->processSample (L);
+            if (eqRight[b] != nullptr) R = eqRight[b]->processSample (R);
+        }
 
         if (chans > 0) buffer.setSample (0, i, L);
         if (chans > 1) buffer.setSample (1, i, R);
@@ -101,6 +104,11 @@ void NeonForgeProcessor::rebuildDSP()
     // EQ bands
     for (int b = 0; b < maxBands; ++b)
     {
+        if (eqLeft[b] == nullptr)
+        {
+            eqLeft[b]  = std::make_unique<juce::dsp::IIR::Filter<float>>();
+            eqRight[b] = std::make_unique<juce::dsp::IIR::Filter<float>>();
+        }
         if (b < profile.eqBands.size())
         {
             const auto& band = profile.eqBands[b];
@@ -113,13 +121,13 @@ void NeonForgeProcessor::rebuildDSP()
                 case 4: coeffs = juce::dsp::IIR::Coefficients<float>::makeHighPass  (sampleRate, band.freq, band.q); break;
                 default: coeffs = juce::dsp::IIR::Coefficients<float>::makePeakFilter (sampleRate, band.freq, band.q, juce::Decibels::decibelsToGain (band.gain)); break;
             }
-            eqLeft.chain.get<b>().coefficients = coeffs;
-            eqRight.chain.get<b>().coefficients = coeffs;
+            eqLeft[b]->coefficients = coeffs;
+            eqRight[b]->coefficients = coeffs;
         }
         else
         {
-            eqLeft.chain.get<b>().coefficients = new juce::dsp::IIR::Coefficients<float>(1.0f, 0.0f, 1.0f, 0.0f);
-            eqRight.chain.get<b>().coefficients = new juce::dsp::IIR::Coefficients<float>(1.0f, 0.0f, 1.0f, 0.0f);
+            eqLeft[b]->coefficients  = new juce::dsp::IIR::Coefficients<float>(1.0f, 0.0f, 1.0f, 0.0f);
+            eqRight[b]->coefficients = new juce::dsp::IIR::Coefficients<float>(1.0f, 0.0f, 1.0f, 0.0f);
         }
     }
 
@@ -146,9 +154,9 @@ void NeonForgeProcessor::rebuildDSP()
     useConv = profile.hasConvolution && profile.irData.getSize() > 0;
 }
 
-juce::Array<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedParams() const
+std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedParams() const
 {
-    juce::Array<DerivedParam> out;
+    std::vector<DerivedParam> out;
     const juce::ScopedLock sl (profileLock);
 
     for (int i = 0; i < profile.eqBands.size(); ++i)

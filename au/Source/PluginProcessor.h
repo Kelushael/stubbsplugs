@@ -51,7 +51,7 @@ public:
         float* value;
         float minVal, maxVal;
     };
-    juce::Array<DerivedParam> getDerivedParams() const;
+    std::vector<DerivedParam> getDerivedParams() const;
 
 private:
     void rebuildDSP();
@@ -68,16 +68,8 @@ private:
     bool useConv = false;
 
     // Parametric EQ
-    struct EQChain {
-        juce::dsp::ProcessorChain<
-            juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>,
-            juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>,
-            juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>,
-            juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Filter<float>
-        > chain;
-    };
-    EQChain eqLeft, eqRight;
     static constexpr int maxBands = 8;
+    std::array<std::unique_ptr<juce::dsp::IIR::Filter<float>>, maxBands> eqLeft, eqRight;
 
     // Dynamics
     juce::dsp::Compressor<float> compressor;
