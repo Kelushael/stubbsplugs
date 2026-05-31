@@ -21,8 +21,8 @@ void NeonForgeProcessor::prepareToPlay (double sr, int samplesPerBlock)
     if (useConv)
         conv.prepare (spec);
 
-    eqLeft.chain.prepare (spec);
-    eqRight.chain.prepare (spec);
+    for (auto& f : eqLeft)  if (f) f->prepare (spec);
+    for (auto& f : eqRight) if (f) f->prepare (spec);
 
     if (useComp)
         compressor.prepare (spec);
@@ -162,21 +162,21 @@ std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedPara
     for (int i = 0; i < profile.eqBands.size(); ++i)
     {
         auto& b = profile.eqBands.getReference (i);
-        out.add ({ "EQ" + juce::String (i+1) + " Freq", &b.freq, 20.0f, 20000.0f });
-        out.add ({ "EQ" + juce::String (i+1) + " Gain", &b.gain, -18.0f, 18.0f });
-        out.add ({ "EQ" + juce::String (i+1) + " Q",    &b.q,    0.1f,   10.0f });
+        out.push_back ({ "EQ" + juce::String (i+1) + " Freq", &b.freq, 20.0f, 20000.0f });
+        out.push_back ({ "EQ" + juce::String (i+1) + " Gain", &b.gain, -18.0f, 18.0f });
+        out.push_back ({ "EQ" + juce::String (i+1) + " Q",    &b.q,    0.1f,   10.0f });
     }
     if (profile.comp.enabled)
     {
-        out.add ({ "Threshold", &profile.comp.threshold_db, -60.0f, 0.0f });
-        out.add ({ "Ratio",     &profile.comp.ratio,        1.0f,   20.0f });
-        out.add ({ "Attack",    &profile.comp.attack_ms,    0.1f,   200.0f });
-        out.add ({ "Release",   &profile.comp.release_ms,   1.0f,   2000.0f });
+        out.push_back ({ "Threshold", &profile.comp.threshold_db, -60.0f, 0.0f });
+        out.push_back ({ "Ratio",     &profile.comp.ratio,        1.0f,   20.0f });
+        out.push_back ({ "Attack",    &profile.comp.attack_ms,    0.1f,   200.0f });
+        out.push_back ({ "Release",   &profile.comp.release_ms,   1.0f,   2000.0f });
     }
     if (profile.sat.enabled)
     {
-        out.add ({ "Drive", &profile.sat.drive_db, 0.0f, 24.0f });
-        out.add ({ "Sat Mix", &profile.sat.mix,    0.0f, 1.0f });
+        out.push_back ({ "Drive", &profile.sat.drive_db, 0.0f, 24.0f });
+        out.push_back ({ "Sat Mix", &profile.sat.mix,    0.0f, 1.0f });
     }
     return out;
 }
