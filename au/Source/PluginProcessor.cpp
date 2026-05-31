@@ -159,35 +159,25 @@ std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedPara
     std::vector<DerivedParam> out;
     const juce::ScopedLock sl (profileLock);
 
-    auto add = [&out] (const char* n, float* v, float mn, float mx)
-    {
-        DerivedParam dp;
-        dp.name   = n;
-        dp.value  = v;
-        dp.minVal = mn;
-        dp.maxVal = mx;
-        out.push_back (dp);
-    };
-
     for (int i = 0; i < profile.eqBands.size(); ++i)
     {
         auto& b = profile.eqBands.getReference (i);
         std::string eqName = "EQ" + std::to_string (i+1);
-        add ((eqName + " Freq").c_str(), &b.freq, 20.0f, 20000.0f);
-        add ((eqName + " Gain").c_str(), &b.gain, -18.0f, 18.0f);
-        add ((eqName + " Q").c_str(),    &b.q,    0.1f,   10.0f);
+        DerivedParam dp1; dp1.name = eqName + " Freq"; dp1.value = &b.freq; dp1.minVal = 20.0f;  dp1.maxVal = 20000.0f; out.push_back (dp1);
+        DerivedParam dp2; dp2.name = eqName + " Gain"; dp2.value = &b.gain; dp2.minVal = -18.0f; dp2.maxVal = 18.0f;   out.push_back (dp2);
+        DerivedParam dp3; dp3.name = eqName + " Q";    dp3.value = &b.q;    dp3.minVal = 0.1f;   dp3.maxVal = 10.0f;    out.push_back (dp3);
     }
     if (profile.comp.enabled)
     {
-        add ("Threshold", &profile.comp.threshold_db, -60.0f, 0.0f);
-        add ("Ratio",     &profile.comp.ratio,        1.0f,   20.0f);
-        add ("Attack",    &profile.comp.attack_ms,    0.1f,   200.0f);
-        add ("Release",   &profile.comp.release_ms,   1.0f,   2000.0f);
+        DerivedParam dpT; dpT.name = "Threshold"; dpT.value = &profile.comp.threshold_db; dpT.minVal = -60.0f; dpT.maxVal = 0.0f;    out.push_back (dpT);
+        DerivedParam dpR; dpR.name = "Ratio";     dpR.value = &profile.comp.ratio;        dpR.minVal = 1.0f;   dpR.maxVal = 20.0f;   out.push_back (dpR);
+        DerivedParam dpA; dpA.name = "Attack";    dpA.value = &profile.comp.attack_ms;    dpA.minVal = 0.1f;   dpA.maxVal = 200.0f;  out.push_back (dpA);
+        DerivedParam dpRel; dpRel.name = "Release"; dpRel.value = &profile.comp.release_ms; dpRel.minVal = 1.0f; dpRel.maxVal = 2000.0f; out.push_back (dpRel);
     }
     if (profile.sat.enabled)
     {
-        add ("Drive",   &profile.sat.drive_db, 0.0f, 24.0f);
-        add ("Sat Mix", &profile.sat.mix,      0.0f, 1.0f);
+        DerivedParam dpD; dpD.name = "Drive";   dpD.value = &profile.sat.drive_db; dpD.minVal = 0.0f; dpD.maxVal = 24.0f; out.push_back (dpD);
+        DerivedParam dpM; dpM.name = "Sat Mix"; dpM.value = &profile.sat.mix;      dpM.minVal = 0.0f; dpM.maxVal = 1.0f;   out.push_back (dpM);
     }
     return out;
 }
