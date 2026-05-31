@@ -50,6 +50,8 @@ public:
         juce::String name;
         float* value;
         float minVal, maxVal;
+        DerivedParam (juce::String n, float* v, float mn, float mx)
+            : name (std::move (n)), value (v), minVal (mn), maxVal (mx) {}
     };
     std::vector<DerivedParam> getDerivedParams() const;
 
