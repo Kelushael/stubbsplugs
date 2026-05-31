@@ -1,0 +1,40 @@
+name: Build Mac AU + Test Sandbox
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-au:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.28.x'
+      - run: |
+          cd au
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake --build build --config Release -j$(sysctl -n hw.ncpu)
+      - run: auval -v aufx Nf01 Nfrg || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NeonForge.component
+          path: au/build/NeonForge_artefacts/Release/AU/NeonForge.component
+
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install numpy scipy
+      - run: |
+          cd python
+          python validate.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-profiles
+          path: python/profiles/
