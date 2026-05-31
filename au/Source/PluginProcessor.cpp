@@ -154,7 +154,7 @@ void NeonForgeProcessor::rebuildDSP()
     useConv = profile.hasConvolution && profile.irData.getSize() > 0;
 }
 
-std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedParams() const
+std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedParams()
 {
     std::vector<DerivedParam> out;
     const juce::ScopedLock sl (profileLock);

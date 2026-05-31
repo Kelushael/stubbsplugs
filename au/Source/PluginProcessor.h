@@ -51,7 +51,7 @@ public:
         float* value;
         float minVal, maxVal;
     };
-    std::vector<DerivedParam> getDerivedParams() const;
+    std::vector<DerivedParam> getDerivedParams();
 
 private:
     void rebuildDSP();
