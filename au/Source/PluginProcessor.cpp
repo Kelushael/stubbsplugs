@@ -162,7 +162,7 @@ std::vector<NeonForgeProcessor::DerivedParam> NeonForgeProcessor::getDerivedPara
     for (int i = 0; i < profile.eqBands.size(); ++i)
     {
         auto& b = profile.eqBands.getReference (i);
-        juce::String eqName = "EQ" + juce::String (i+1);
+        std::string eqName = "EQ" + std::to_string (i+1);
         out.push_back ({eqName + " Freq", &b.freq, 20.0f, 20000.0f});
         out.push_back ({eqName + " Gain", &b.gain, -18.0f, 18.0f});
         out.push_back ({eqName + " Q",    &b.q,    0.1f,   10.0f});

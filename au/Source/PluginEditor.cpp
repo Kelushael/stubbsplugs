@@ -138,7 +138,7 @@ void NeonForgeEditor::rebuildKnobs()
         addAndMakeVisible (slider);
 
         auto* label = knobLabels.add (new juce::Label());
-        label->setText (dp.name, juce::dontSendNotification);
+        label->setText (juce::String (dp.name), juce::dontSendNotification);
         label->setJustificationType (juce::Justification::centred);
         label->setColour (juce::Label::textColourId, juce::Colours::grey);
         addAndMakeVisible (label);

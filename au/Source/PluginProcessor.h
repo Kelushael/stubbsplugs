@@ -47,7 +47,7 @@ public:
 
     // ---- Parametric knob access (for editor) ----
     struct DerivedParam {
-        juce::String name;
+        std::string name;
         float* value;
         float minVal, maxVal;
     };
